@@ -22,7 +22,7 @@ typedef struct node
 
 node* create_tree(int value);
 
-node* insert(node* root, int value);
+node* insert(node** root, int value);
 
  
 node* balance(node* root);  /// returns a new root

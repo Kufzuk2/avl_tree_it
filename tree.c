@@ -46,7 +46,7 @@ node* insert(node** root, int value)
                 son->value_        =                     value;
                 son-> left_height_ =                         0;
                 son->right_height_ =                         0;
-                son->total_height_ =      *root->total_height_;
+                son->total_height_ =    (*root)->total_height_;
                 son->height_       = old_parent->height_   - 1;
                 son->position_     = old_parent->position_ * 2;
                 son->is_right_     =                     false;
@@ -68,7 +68,7 @@ node* insert(node** root, int value)
                 son->value_        =                         value;
                 son-> left_height_ =                             0;
                 son->right_height_ =                             0;
-                son->total_height_ =           root->total_height_;
+                son->total_height_ =        (*root)->total_height_;
                 son->height_       = old_parent->height_       - 1;
                 son->position_     = old_parent->position_ * 2 + 1;
                 son->is_right_     =                          true;
@@ -90,13 +90,11 @@ node* insert(node** root, int value)
     {
         node* parent = problem_leave->parent_;                                                     
         bool is_right = problem_leave->is_right_;
-        printf("problem in %d, son_value = %d \n", problem_leave->value_, son->value_);
         node* new_leave = balance(problem_leave);
 
-        printf("just balanced \n");
         if (!parent) //not needed seems
         {
-            root = new_leave;
+            *root = new_leave;
         }
         else if (is_right)
         {
@@ -111,7 +109,7 @@ node* insert(node** root, int value)
     } 
     
     if (son->height_ < 0)
-        raise_heights(root, 2);
+        raise_heights(*root, 2);
 
     return son;
 
@@ -188,13 +186,11 @@ int decrease_heights(node* root)  /// height-- in the whole tree under the menti
 
     if (root->left_) 
     {
-        printf("1 cycle \n");
         decrease_heights(root->left_);
     }
     
     if (root->right_)
     {
-        printf("1 cycle \n");
         decrease_heights(root->right_);
     }
     
@@ -236,17 +232,14 @@ node* balance(node* root)  // returns new root of the given subtree
 {
     if (root->left_height_ < root->right_height_)
     {
-        printf("inside 1 cycle \n");
 
         if (root->right_->left_height_ <= root->right_->right_height_)
         {
-            printf("must fall after this \n");
             return left_small_turn(root);
         }
         return left_big_turn(root);
     }
 
-    printf("1 cycle skipped \n");
     if (root->left_->right_height_ <= root->left_->left_height_)
         return right_small_turn(root);
     return right_big_turn(root);
@@ -268,12 +261,10 @@ node* left_small_turn(node* root)
     root->right_   = root->right_->left_;
     new_root->left_ = root;
     root->parent_ = new_root;
-    printf("here 6, root_height = %d \n", root->height_);
 
     decrease_heights(root->left_);
     root->height_--;
 
-    printf("here 6, root_height = %d \n", root->height_);
     raise_heights(new_root->right_, 1);
     new_root->height_++;
 
@@ -282,24 +273,15 @@ node* left_small_turn(node* root)
 
     root->right_height_ = root->left_height_;
 
-    if(new_root->left_->is_right_)
-        printf("beda left \n");
-
-    if(!new_root->right_->is_right_)
-        printf("beda right \n");
-#if 0 
-    root->is_right = false; 
-# endif  // already false
-
     
     new_root->position_ = root_pos;
-    printf("root-pos = %d  \n", root_pos);
     if (!recalc_positions(new_root))
         return NULL;
-
+/*
     printf("for 6: h = %d  l_h = %d, r_h = %d, pos = %d \n", root->height_, root->left_height_, root->right_height_, root->position_);
     printf("for 7: h = %d  l_h = %d, r_h = %d, pos = %d \n", new_root->height_, new_root->left_height_, new_root->right_height_, new_root->position_);
     printf("for 8: h = %d  l_h = %d, r_h = %d, pos = %d \n", new_root->right_->height_, new_root->right_->left_height_, new_root->right_->right_height_, new_root->right_->position_);
+    */
     return new_root;
 }
 
@@ -307,22 +289,25 @@ node* left_big_turn(node* root)
 {
     int root_pos = root->position_;
 
-    printf("here 1 \n");
     node* new_root = root->right_->left_;
-    printf("here 1 \n");
-    new_root-> left_->parent_ = root;
-    printf("here 2 \n");
-    new_root->right_->parent_ = new_root->parent_;
-    printf("here 3 \n");
+
+    if (new_root->left_)
+        new_root->left_->parent_ = root;
+
+
+    if (new_root->right_)
+        new_root->right_->parent_ = new_root->parent_;
 
     root->right_ = new_root->left_;
-    printf("here 4 \n");
-    root->right_->is_right_ = true;
-    printf("here 5 \n");
+    
+
+    if (root->right_)
+        root->right_->is_right_ = true;
+
     new_root->parent_->left_ = new_root->right_;
-    printf("here 6 \n");
+
+    if (new_root->parent_->left_)
     new_root->parent_->left_->is_right_ = false;
-    printf("here 7 \n");
     
     new_root->left_ = root;
     new_root->left_->parent_ = new_root;
@@ -355,39 +340,73 @@ node* left_big_turn(node* root)
 
 node* right_small_turn(node* root)
 {
+    int root_pos = root->position_;
     node* new_root = root->left_;
     new_root->parent_ = NULL;
 
-    root->left_->right_->parent_ = root;
+
+    if (root->left_->right_)
+    {
+        root->left_->right_->parent_ = root;
+    }
+    
+
     root->left_   = root->left_->right_;
     new_root->right_ = root;
     root->parent_ = new_root;
 
     decrease_heights(root->right_);
+    root->height_--;
+
     raise_heights(new_root->left_, 1);
-    new_root->right_->is_right_ = false;
+    new_root->height_++;
+
+    new_root-> left_->is_right_ = false;
+    new_root->right_->is_right_ =  true;  // doubt
+
     new_root->right_height_++;
 
-    root->is_right_ = true; 
-
+    root->left_height_ = root->right_height_;
 
     
+    new_root->position_ = root_pos;
     if (!recalc_positions(new_root))
         return NULL;
-
+/*
+    printf("for 6: h = %d  l_h = %d, r_h = %d, pos = %d \n", root->height_, root->left_height_, root->right_height_, root->position_);
+    printf("for 7: h = %d  l_h = %d, r_h = %d, pos = %d \n", new_root->height_, new_root->left_height_, new_root->right_height_, new_root->position_);
+    printf("for 8: h = %d  l_h = %d, r_h = %d, pos = %d \n", new_root->right_->height_, new_root->right_->left_height_, new_root->right_->right_height_, new_root->right_->position_);
+    */
     return new_root;
 }
 
 node* right_big_turn(node* root)
 {
+    int root_pos = root->position_;
+
     node* new_root = root->left_->right_;
 
-    new_root->right_->parent_ = root;
-    new_root-> left_->parent_ = new_root->parent_;
+    if (new_root->right_)
+        new_root->right_->parent_ = root;
+
+
+    if (new_root->left_)
+        new_root->left_->parent_ = new_root->parent_;
 
     root->left_ = new_root->right_;
-    root->left_->is_right_ = false;
+    
+
+    if (root->left_)
+        root->left_->is_right_ = false;
+   
+#if 0
+    if (root->right_)
+        root->right_->is_right_ = true;   // doubt
+#endif
+
     new_root->parent_->right_ = new_root->left_;
+
+    if (new_root->parent_->right_)
     new_root->parent_->right_->is_right_ = true;
     
     new_root->right_ = root;
@@ -408,8 +427,10 @@ node* right_big_turn(node* root)
 
     root->left_height_ -= 2;
     new_root->left_->right_height_--;
-    new_root-> right_height_ = root->right_height_ + 1;  // left height must not be higher than right
+    new_root-> right_height_ = root->right_height_ + 1;  // right height must not be higher than left
     new_root->left_height_ = new_root->left_->left_height_ + 1;
+
+    new_root->position_ = root_pos;
 
     if (!recalc_positions(new_root))
         return NULL;
@@ -424,7 +445,6 @@ int recalc_positions(node* root) // must not be problems wight parent, cause bal
 
     if (root->left_)
     {
-        printf("work wigh left \n");
         root->left_->position_ = root->position_ * 2;
         if (!recalc_positions(root->left_))
             return 0;
@@ -432,7 +452,6 @@ int recalc_positions(node* root) // must not be problems wight parent, cause bal
 
     if (root->right_)
     {
-        printf("work wigh rigth \n");
         root->right_->position_ = root->position_ * 2 + 1;
         if (!recalc_positions(root->right_))
             return 0;
@@ -523,7 +542,8 @@ void smart_print(node* root)
     int print_pos = d;
 
     print_space(d);
-    printf("%d (%d %d)", root->value_, root->left_height_, root->right_height_);
+    printf("%d", root->value_);
+    //printf("%d (%d %d)", root->value_, root->left_height_, root->right_height_);
     print_space(d);
     printf("\n");
 
