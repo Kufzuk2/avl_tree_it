@@ -24,6 +24,8 @@ node* create_tree(int value);
 
 node* insert(node** root, int value);
 
+void chop_tree(node* root);
+
  
 node* balance(node* root);  /// returns a new root
 
@@ -47,9 +49,11 @@ node* delete_leave(int value);
 
 void print_tree(node* root); 
 
+void print_n(int value, int max_ord);
+
 node* is_in_tree(node* root, int value);
 
-void smart_print(node* root);
+void smart_print(node* root, int max_ord);
 
 int recalc_positions(node* root); // must not be problems wight parent, cause balancing leaves at least 2 levels
 

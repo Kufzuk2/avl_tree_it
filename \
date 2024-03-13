@@ -1,0 +1,52 @@
+#include "tree.h"
+#include <time.h>
+int main()
+{
+    int max_ord = 4;
+    printf("func started \n");
+
+    printf("\n");
+    
+   /* srand(time(NULL));
+
+    node* tree = create_tree(rand() % 150);
+
+    for (int i = 0; i < 10; i++)
+    {
+        insert(&tree, rand() % 100);
+        smart_print(tree, max_ord);
+        printf("\n");
+    }*/
+    
+    node* tree = create_tree(20);
+
+        insert(&tree, 3);
+        smart_print(tree, max_ord);
+        printf("\n");
+
+        insert(&tree, 100);
+        smart_print(tree, max_ord);
+        printf("\n");
+
+        insert(&tree, 300);
+        smart_print(tree, max_ord);
+        printf("\n");
+
+        insert(&tree, 10);
+        smart_print(tree, max_ord);
+        printf("\n");
+
+        insert(&tree, 250);
+        smart_print(tree, max_ord);
+        printf("\n");
+
+        insert(&tree, 15);
+        smart_print(tree, max_ord);
+        printf("\n");
+
+        insert(&tree, 275);
+        smart_print(tree, max_ord);
+        printf("\n");
+    chop_tree(tree);
+
+}

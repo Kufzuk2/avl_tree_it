@@ -1,20 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-struct a
-{
-    bool ifis;
-};
+    if (new_root->right_)
+    {
+        new_root->right_->parent_ = root;
+        root->left_ = new_root->right_; 
+        root->left_->is_right_ = false;
+    }
 
-int main()
-{
-    struct a* b = (struct a*) calloc(1, sizeof(struct a));
-
-    if (b->ifis)
-        printf("true");
-
-    if (!b->ifis)
-        printf("false");
-
-    printf("%d \n", abs(-5));
-}
+    if (new_root->left_)
+    {
+        new_root->left_->parent_ = root;
+        root->right_ =  new_root->left_; 
+        root->right_->is_right_ =  true;
+    }
