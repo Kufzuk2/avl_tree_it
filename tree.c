@@ -63,7 +63,7 @@ node* insert(node** root, int value)
     {
         if (value == old_parent->value_)
         {
-            printf("HIT\n");
+            printf(RED "HIT\n" RESET);
             return old_parent;  
         }
                                                    
@@ -129,6 +129,8 @@ node* insert(node** root, int value)
         bool is_right = problem_leave->is_right_;
         node* new_leave = balance(problem_leave);
 
+
+#if 0 
         printf("new_leave = %d, new->left = %d, new->right = %d, left_parent = %d, right_parent = %d \n", new_leave->value_, new_leave->left_->value_, new_leave->right_->value_, new_leave->left_->parent_->value_, new_leave->right_->parent_->value_);
 
         
@@ -138,18 +140,6 @@ node* insert(node** root, int value)
         if (!new_leave->left_->is_right_)
             printf("left is left \n");
 
-        /*if (!new_leave->right_->is_right_)
-            printf("right is left \n");
-
-        if (!new_leave->right_->left_->is_right_)
-            printf("root_left is left \n");
-
-        if (!new_leave->right_->right_->is_right_)
-            printf("root_right is left \n");
-*/
-        printf("allright \n");
-
-//        printf("root_left = %d \n", new_leave->right_->left_->value_);
 
         if (new_leave->parent_)
         {
@@ -157,8 +147,11 @@ node* insert(node** root, int value)
             if (new_leave->parent_->right_)
                 printf("par->left = %d \n", new_leave->parent_->right_->value_);
         }
+#endif  // for checkings
 
-        if (!parent) //not needed seems
+
+
+        if (!parent) 
         {
             *root = new_leave;
         }
@@ -226,10 +219,7 @@ node* is_in_tree(node* root, int value) ///NULL if no, pointer if yes/////// nod
 int raise_heights(node* root, int param_one)  /// height++ in the whole tree,  if param = 1, total height not touched, if 2, touched
 {
     if (!root) 
-    {
-        //printf("root = null \n");
         return 0;
-    }
 
 
     if (root->left_) 
@@ -276,43 +266,31 @@ node* raise_part_heights(node* new_leave) // returns NULL if no balancing needed
 
     while(cur_leave->parent_)
     {
-        /*
-        if (cur_leave->value_ == 33 & is_right)
-        {
-            printf(" 33 is ri\n");
-        }*/
-
         if (cur_leave->is_right_)
         {
-        //    printf(" right \n");
             cur_leave->parent_->right_height_++;
             if (cur_leave->parent_->right_height_ <= cur_leave->parent_->left_height_)
                 break;
         }
         else
         {
-          //  printf(" left\n");
             cur_leave->parent_->left_height_++;
             if (cur_leave->parent_->right_height_ >= cur_leave->parent_->left_height_)
                 break;
         }
 
-       
+#if 0       
         //printf("par_right_tree = %d, par_left = %d. par_val = %d \n", cur_leave->parent_->right_height_, cur_leave->parent_->left_height_, cur_leave->parent_->value_);
 
         //printf("tree_dif = %d \n", abs(cur_leave->parent_->right_height_ - cur_leave->parent_->left_height_));
+#endif  // for additional checking
+
 
         if (abs(cur_leave->parent_->right_height_ - cur_leave->parent_->left_height_) >= 2)
             return cur_leave->parent_;
         
-
         cur_leave = cur_leave->parent_;
-        //printf("next val = %d \n", );
-
     }
-
-    //printf("working with part_heights, new_leave = %d \n", new_leave->value_);
-
     return NULL;
 }
 
@@ -333,6 +311,7 @@ node* balance(node* root)  // returns new root of the given subtree
         return right_small_turn(root);
     return right_big_turn(root);
 }
+
 
 node* left_small_turn(node* root)
 {
@@ -379,11 +358,15 @@ node* left_small_turn(node* root)
     new_root->position_ = root_pos;
     if (!recalc_positions(new_root))
         return NULL;
+
+#if 0 
 /*
     printf("for 6: h = %d  l_h = %d, r_h = %d, pos = %d \n", root->height_, root->left_height_, root->right_height_, root->position_);
     printf("for 7: h = %d  l_h = %d, r_h = %d, pos = %d \n", new_root->height_, new_root->left_height_, new_root->right_height_, new_root->position_);
     printf("for 8: h = %d  l_h = %d, r_h = %d, pos = %d \n", new_root->right_->height_, new_root->right_->left_height_, new_root->right_->right_height_, new_root->right_->position_);
     */
+#endif  // extra checks
+
     return new_root;
 }
 
@@ -488,7 +471,7 @@ node* right_small_turn(node* root)
     new_root->height_++;
 
     new_root-> left_->is_right_ = false;
-    new_root->right_->is_right_ =  true;  // doubt
+    new_root->right_->is_right_ =  true;  
 
     if (root->left_)
         root->left_->is_right_ = false; // not sure, just symmetry
@@ -501,11 +484,15 @@ node* right_small_turn(node* root)
     new_root->position_ = root_pos;
     if (!recalc_positions(new_root))
         return NULL;
+
+#if 0
 /*
     printf("for 6: h = %d  l_h = %d, r_h = %d, pos = %d \n", root->height_, root->left_height_, root->right_height_, root->position_);
     printf("for 7: h = %d  l_h = %d, r_h = %d, pos = %d \n", new_root->height_, new_root->left_height_, new_root->right_height_, new_root->position_);
     printf("for 8: h = %d  l_h = %d, r_h = %d, pos = %d \n", new_root->right_->height_, new_root->right_->left_height_, new_root->right_->right_height_, new_root->right_->position_);
     */
+#endif  // extra check
+
     return new_root;
 }
 
@@ -522,17 +509,14 @@ node* right_big_turn(node* root)
     {
         pre_root = root->parent_;
         root_is_right = root->is_right_;
-//        pre_root->
     }
 
 
     if (new_root->right_)
     {
-        new_root->right_->parent_ = root;  //new_root->parent_
+        new_root->right_->parent_ = root; 
     }
-    root->left_ = new_root->right_; // seems very strange
-   // printf("root->left = %d \n", root->left_->value_);                                    
-
+    root->left_ = new_root->right_; 
 
 
     if (new_root->left_)
@@ -546,7 +530,7 @@ node* right_big_turn(node* root)
         root->left_->is_right_ = false;
    
     if (root->right_)
-        root->right_->is_right_ = true;   // doubt
+        root->right_->is_right_ = true;   
 
 
 
@@ -554,9 +538,7 @@ node* right_big_turn(node* root)
         new_root->parent_->right_->is_right_ = true;
     
 
-    //new_root->parent_->left_ = new_root->right_; old version
-
-    if (new_root->parent_->left_)                       // was not initially written
+    if (new_root->parent_->left_)                    
     {
         new_root->parent_->left_->is_right_ = false;    
     }
@@ -572,7 +554,6 @@ node* right_big_turn(node* root)
     new_root->parent_ = pre_root;
     new_root->is_right_ = root_is_right;
 
-//    if (root_is_right)
 
     raise_heights(root->left_, 1);
     raise_heights(root->left_, 1); 
@@ -592,6 +573,7 @@ node* right_big_turn(node* root)
 
     new_root->right_->is_right_ = true;
 
+#if 0
    /* printf("root->left = %d,root->right = %d,  root = %d \n", root->left_->value_, root->right_->value_, root->value_);                        
 
         if (!root->is_right_)
@@ -603,6 +585,8 @@ node* right_big_turn(node* root)
         if (!root->right_->is_right_)
             printf("right is left \n");
 */
+#endif  // extra check
+
 
     if (!recalc_positions(new_root))
         return NULL;
@@ -688,11 +672,6 @@ void q_print(queue* front)   // prints queue
 }
 ///***************************************
 
-/*
-void kill_queue(queue* front)
-{
-    while()
-}*/
 
 void smart_print(node* root, int max_ord)
 {
@@ -728,8 +707,6 @@ void smart_print(node* root, int max_ord)
     print_space(d);
     
     print_n(root->value_, max_ord);
-//    printf("%d", root->value_);
-    //printf("%d (%d %d)", root->value_, root->left_height_, root->right_height_);
     print_space(d);
     printf("\n");
 
@@ -740,16 +717,19 @@ void smart_print(node* root, int max_ord)
 
     int  cur_pos   =           0;
     int line_pos   =           0;
-    int kostyl_pos =           0;
+    int kostyl_pos =           0;  // probably pointless
     int  cur_h     = total_h - 1;
 
+#if 0
     //printf("d = %d, h = %d, cur_h = %d, cur_pos = %d \n", d, front->next_->leave_->height_, cur_h, cur_pos);
+#endif  // extra check
+
+
     while (front->next_)
     {
 
         if (front->next_->leave_->height_ != cur_h)
         {
-//            printf("cur_pos = %d, width  = %d \n", cur_pos, width);
             print_space(width - cur_pos);
             printf("\n");
             cur_pos = 0;
@@ -770,10 +750,8 @@ void smart_print(node* root, int max_ord)
         print_pos = d + front->next_->leave_->position_ * (2 * d + max_ord + 1);
 
         print_space(print_pos - cur_pos);
-        //printf("%d", front->next_->leave_->value_);
         print_n(front->next_->leave_->value_, max_ord);
-        //printf("(%d %d)", front->next_->leave_->left_height_, front->next_->leave_->right_height_);
-        //
+
 #ifdef RL
         if (front->next_->leave_->is_right_)
         {
@@ -783,18 +761,15 @@ void smart_print(node* root, int max_ord)
         {
             printf("(l)");
         }
-#endif
- //       printf("d = %d, h = %d, cur_h = %d, cur_pos = %d \n", d, front->next_->leave_->height_, cur_h, cur_pos);
+#endif // for right_left control
 
         kostyl_pos =   cur_pos + max_ord;
         cur_pos    = print_pos + max_ord;
         front = dequeue(front);
 
     }   
-    //print_space(width - kostyl_pos - 1);
     free(front);
     print_space(width - cur_pos);
-    //printf("wid - c_h = %d \n", width - cur_pos);
     printf("\n");
 }
 
